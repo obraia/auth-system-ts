@@ -1,25 +1,24 @@
 // eslint-disable-next-line no-unused-vars
 import { Request, Response } from 'express';
+import * as dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
-import 'dotenv';
 
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 import knex from '../database/connection';
 
+dotenv.config();
+
 class SessionController {
   async create (req: Request, res: Response) {
     const { username, password, rememberMe } = req.body;
 
-    const user: User = await knex('users')
+    const user = await knex('users')
       .where('username', username)
       .select('*')
-      .first()
-      .catch((err: any) => {
-        console.log(err);
-      });
+      .first();
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -31,7 +30,7 @@ class SessionController {
 
     delete user.password;
 
-    const keyPath = path.join(__dirname, '../', 'config', 'private.pem');
+    const keyPath = path.join(__dirname, '../', 'config', 'keys', 'private.pem');
     const privateKey = fs.readFileSync(keyPath, 'utf8');
 
     let token;
