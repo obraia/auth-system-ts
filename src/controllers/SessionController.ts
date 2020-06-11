@@ -53,11 +53,11 @@ class SessionController {
   }
 
   async update (req: Request, res: Response) {
-    res.status(501).json({ message: 'Not implemented' });
+    return res.status(501).json({ message: 'Not implemented' });
   }
 
   async delete (req: Request, res: Response) {
-    res.status(501).json({ message: 'Not implemented' });
+    return res.status(501).json({ message: 'Not implemented' });
   }
 }
 
