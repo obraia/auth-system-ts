@@ -21,11 +21,11 @@ class SessionController {
       .first();
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json('User not found');
     }
 
     if (!await bcrypt.compare(password, user.password)) {
-      return res.status(401).json({ error: 'Incorrect password' });
+      return res.status(401).json('Incorrect password');
     }
 
     delete user.password;
