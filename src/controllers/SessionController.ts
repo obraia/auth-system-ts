@@ -49,7 +49,7 @@ class SessionController {
         });
     };
 
-    return res.status(200).json({ user, token });
+    return res.status(200).json({ username: user.username, token });
   }
 
   async update (req: Request, res: Response) {
