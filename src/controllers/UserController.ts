@@ -18,7 +18,7 @@ class UserController {
       .first();
 
     if (user) {
-      return res.status(409).json({ error: 'User already exists' });
+      return res.status(409).json('User already exists');
     }
 
     const saltRounds = parseInt(String(process.env.SALT_ROUNDS));
@@ -47,7 +47,7 @@ class UserController {
       .first();
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json('User not found');
     }
 
     await knex('users').where('username', username).del();
