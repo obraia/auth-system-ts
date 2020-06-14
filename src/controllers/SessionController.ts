@@ -44,7 +44,8 @@ class SessionController {
     } else {
       token = jwt.sign({ id: user.username },
         { key: privateKey, passphrase: String(process.env.PASS_PHRASE) }, {
-          expiresIn: 7200 // --> 2 hours
+          expiresIn: 7200, // --> 2 hours
+          algorithm: 'RS256'
         });
     };
 
