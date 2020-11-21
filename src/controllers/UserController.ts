@@ -1,37 +1,42 @@
 // eslint-disable-next-line no-unused-vars
 import { Request, Response } from 'express';
 import * as dotenv from 'dotenv';
-
 import bcrypt from 'bcrypt';
 
-import knex from '../database/connection';
+// eslint-disable-next-line no-unused-vars
+import { IController } from '../interfaces/IController';
+import { UserRepository } from '../repositories/UserRepository';
+import { CustomError } from '../utils/CustomError';
 
 dotenv.config();
 
-class UserController {
+class UserController implements IController {
+  async index (req: Request, res: Response) {
+    return res.status(501).json({ message: 'Not implemented' });
+  }
+
   async create (req: Request, res: Response) {
     const { username, password } = req.body;
+    const userRepository = new UserRepository();
 
-    const user = await knex('users')
-      .where('username', username)
-      .select('username')
-      .first();
+    try {
+      const user = await userRepository.index(username);
 
-    if (user) {
-      return res.status(409).json('User already exists');
+      if (user) throw new CustomError('User already exists', 409);
+
+      const saltRounds = parseInt(String(process.env.SALT_ROUNDS));
+      const salt = await bcrypt.genSalt(saltRounds);
+      const hashPassword = await bcrypt.hash(password, salt);
+
+      await userRepository.create({
+        username,
+        password: hashPassword
+      });
+
+      return res.status(201).json({ message: 'success' });
+    } catch (err) {
+      return res.status(err.status).json({ message: err.message });
     }
-
-    const saltRounds = parseInt(String(process.env.SALT_ROUNDS));
-
-    const salt = await bcrypt.genSalt(saltRounds);
-    const hash = await bcrypt.hash(password, salt);
-
-    await knex('users').insert({
-      username,
-      password: hash
-    });
-
-    return res.status(201).json({ message: 'success' });
   }
 
   async update (req: Request, res: Response) {
@@ -40,20 +45,20 @@ class UserController {
 
   async delete (req: Request, res: Response) {
     const { username } = req.params;
+    const userRepository = new UserRepository();
 
-    const user = await knex('users')
-      .where('username', username)
-      .select('username')
-      .first();
+    try {
+      const user = await userRepository.index(username);
 
-    if (!user) {
-      return res.status(404).json('User not found');
+      if (!user) throw new CustomError('User not found', 404);
+
+      await userRepository.delete(username);
+
+      return res.status(201).json({ message: 'success' });
+    } catch (err) {
+      return res.status(err.status).json({ message: err.message });
     }
-
-    await knex('users').where('username', username).del();
-
-    return res.status(201).json({ message: 'success' });
   }
 }
 
-export default UserController;
+export { UserController };

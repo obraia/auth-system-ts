@@ -1,8 +1,8 @@
 import express from 'express';
 
-import UserController from './controllers/UserController';
-import SessionController from './controllers/SessionController';
-import AuthMiddleware from './middlewares/AuthMiddleware';
+import { UserController } from './controllers/UserController';
+import { SessionController } from './controllers/SessionController';
+import { AuthMiddleware } from './middlewares/AuthMiddleware';
 
 const routes = express.Router();
 
@@ -14,4 +14,4 @@ routes.delete('/users/:username', authMiddleware.authenticate, userController.de
 routes.post('/register', userController.create);
 routes.post('/authenticate', sessionController.create);
 
-export default routes;
+export { routes };
